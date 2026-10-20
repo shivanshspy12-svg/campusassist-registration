@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Specialization registration assistant demo">
+  <title>CampusAssist | Specialization Registration</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    .field-full{grid-column:1/-1}.field input,.field select{width:100%;box-sizing:border-box}
+    .course-choice-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 18px}
+    .specialization-card{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid #e4e9f2;border-radius:10px;background:#fff;cursor:pointer;text-align:left;color:inherit}
+    .specialization-card:hover{border-color:#8194ff;background:#f7f8ff}.specialization-card .course-symbol{flex-shrink:0}
+    .specialization-card strong{font-size:12px;display:block}.specialization-card small{font-size:10px;color:#7e8ba0;display:block;margin-top:2px}
+    .criteria-box{background:#f2f5ff;border:1px solid #dfe5ff;padding:12px;border-radius:10px;margin:12px 0;font-size:12px;color:#4c5c8d}
+    .criteria-box strong{color:#263d9e}.criteria-box .criteria-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .criteria-pills span{background:#fff;border:1px solid #e0e5f5;border-radius:7px;padding:5px 8px;font-size:11px}
+    .result-box{white-space:pre-line;padding:12px;border-radius:9px;margin-top:12px;background:#eef3ff;color:#314b9d;font-size:12px}
+    .result-box.error{background:#fff0f0;color:#a23843}.result-box.success{background:#e9f8f1;color:#176e52}
+    .hidden{display:none!important}.field small{font-size:10px;color:#8793a7;display:block;margin-top:4px}
+    .chat-messages{max-height:290px;overflow-y:auto;display:flex;flex-direction:column;gap:9px}
+    .chat-bubble{white-space:pre-line;line-height:1.55;overflow-wrap:anywhere}.chat-input-row input{min-width:0;flex:1}
+    .chat-message-user{align-self:flex-end;background:#e9eeff;color:#354da8;border-radius:12px 12px 3px 12px;padding:9px 11px;max-width:90%;font-size:12px;white-space:pre-wrap}
+    .chat-message-bot{align-self:flex-start;background:#fff;border:1px solid #e5eaf3;border-radius:3px 12px 12px 12px;padding:9px 11px;max-width:96%;font-size:12px;white-space:pre-wrap}
+    .suggestion-chips{display:flex;flex-wrap:wrap;gap:6px}.suggestion-chips button{border:1px solid #dfe5f3;background:#fff;border-radius:16px;padding:6px 9px;font-size:10px;color:#4b5dc1}
+    @media(max-width:760px){.course-choice-list{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field-full{grid-column:auto}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">C</span><span>Campus<span class="brand-light">Assist</span><small>STUDENT REGISTRATION PORTAL</small></span></a>
+    <nav><a href="#registration">Registration</a><a href="#specializations">Specializations</a><a href="#assistant">Chat assistant</a></nav>
+    <span class="demo-pill"><span></span> Demo environment</span>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="sparkle">✦</span> SPECIALIZATION REGISTRATION</div>
+        <h1>Your next semester,<br><span>your next direction.</span></h1>
+        <p>Enter your student details, select a specialization, check your eligibility, and get instant help from the CampusAssist chatbot.</p>
+        <div class="hero-actions"><a class="btn btn-primary" href="#registration">Start registration <span>→</span></a><a class="text-link" href="#assistant">Ask the assistant ↗</a></div>
+        <div class="hero-proof"><span class="proof-icon">✓</span> Semester 5+ <span class="proof-icon">✓</span> Course eligibility <span class="proof-icon">✓</span> Chat support</div>
+      </div>
+      <div class="hero-art" aria-hidden="true"><div class="orb orb-one"></div><div class="orb orb-two"></div><div class="mock-window"><div class="mock-dots"><i></i><i></i><i></i><span>COURSE MATCH</span></div><div class="mock-title">Find your specialization</div><div class="mock-course"><b class="course-icon purple">AI</b><div><strong>AI &amp; Machine Learning</strong><small>Demo CGPA: 8.50+</small></div><span>✦</span></div><div class="mock-course"><b class="course-icon mint">CS</b><div><strong>Cybersecurity</strong><small>Demo CGPA: 8.00+</small></div><span>✓</span></div></div></div>
+    </section>
+    <div class="notice"><span>ⓘ</span><p><strong>Important:</strong> CGPA and credit requirements are sample values for this student-project demo, not official college rules. Verify actual criteria with your department.</p></div>
+    <section class="content-grid" id="registration">
+      <div class="panel registration-panel">
+        <div class="section-heading"><div><div class="eyebrow">STUDENT DETAILS</div><h2>Specialization registration form</h2><p>All fields are required to check your demo eligibility.</p></div><span class="step-tag">STEP 1 OF 2</span></div>
+        <form id="registration-form" novalidate>
+          <div class="form-section-title"><span>01</span><h3>Personal information</h3></div>
+          <div class="form-grid">
+            <label class="field">First name <span class="required">*</span><input id="first-name" name="first_name" placeholder="e.g. Shivansh" autocomplete="given-name" maxlength="60" required></label>
+            <label class="field">Last name <span class="required">*</span><input id="last-name" name="last_name" placeholder="e.g. Yadav" autocomplete="family-name" maxlength="60" required></label>
+            <label class="field">Roll number <span class="required">*</span><input id="roll-no" name="roll_no" placeholder="e.g. 23CS104" maxlength="40" required></label>
+            <label class="field">Division <span class="required">*</span><select id="division" name="division" required><option value="">Select division</option><option>A</option><option>B</option><option>C</option><option>D</option><option>Other</option></select></label>
+            <label class="field">Email ID <span class="required">*</span><input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" maxlength="150" required></label>
+            <label class="field">Phone number <span class="required">*</span><input id="phone" name="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit phone number" required><small>Enter 10 digits, without country code.</small></label>
+            <label class="field">Current semester <span class="required">*</span><select id="semester" name="semester" required><option value="">Select semester</option>{% for s in range(5, 11) %}<option value="{{ s }}">{{ s }}{{ 'th' if s not in [5, 8] else ('th' if s == 5 else 'th') }} semester</option>{% endfor %}</select><small>Only 5th semester and above.</small></label>
+            <label class="field">Current CGPA <span class="required">*</span><input id="cgpa" name="cgpa" type="number" min="1" max="10" step="0.01" placeholder="e.g. 8.50" required><small>Range: 1.00 to 10.00.</small></label>
+            <label class="field">Credits completed <span class="required">*</span><input id="credits" name="credits" type="number" min="1" max="100" step="1" placeholder="e.g. 60" required><small>Range: 1 to 100 credits.</small></label>
+            <label class="field">Specialization course <span class="required">*</span><select id="course" name="course" required><option value="">Choose a specialization</option>{% for name in courses.keys() %}<option value="{{ name }}">{{ name }}</option>{% endfor %}</select></label>
+          </div>
+          <div id="course-criteria" class="criteria-box hidden"></div>
+          <div class="form-actions"><button class="btn btn-secondary" id="check-eligibility" type="button">Check eligibility <span>→</span></button><button class="btn btn-primary" type="submit" id="submit-registration">Submit registration <span>↗</span></button></div>
+          <div id="registration-result" class="result-box" role="status" aria-live="polite" hidden></div>
+          <p class="chat-footnote">Demo only: this form validates details and displays a result; it does not save or submit an official college registration.</p>
+        </form>
+      </div>
+      <aside class="side-column">
+        <section class="panel side-panel" id="specializations">
+          <div class="eyebrow">EXPLORE OPTIONS</div><h2>Specializations</h2><p>Tap a course to view its sample requirements.</p>
+          <div class="course-choice-list">
+            {% for name, rule in courses.items() %}
+            <button type="button" class="specialization-card" data-course="{{ name }}"><span class="course-symbol symbol-{{ loop.index }}">{{ rule.short[:2] }}</span><span><strong>{{ name }}</strong><small>CGPA {{ '%.2f'|format(rule.cgpa) }}+ · {{ rule.credits }}+ credits</small></span></button>
+            {% endfor %}
+          </div>
+          <div class="small-warning">Requirements are examples only. Official college rules may differ.</div>
+        </section>
+        <section class="assistant-card" id="assistant">
+          <div class="assistant-top"><div class="bot-avatar">✦</div><div><strong>CampusAssist Chatbot</strong><small><span class="online-dot"></span> NLP course helper</small></div><span class="sparkle-label">HELP</span></div>
+          <h3>Ask me anything about registration</h3><p>I can help with registration steps, CGPA, credits, semesters, course choices, and common form questions.</p>
+          <div class="suggestion-chips"><button type="button" class="suggestion">How do I register?</button><button type="button" class="suggestion">What CGPA for AIML?</button><button type="button" class="suggestion">Credits for Cybersecurity?</button><button type="button" class="suggestion">Help me choose a course</button></div>
+          <div class="chat-messages" id="chat-messages" aria-live="polite"><div class="chat-bubble bot-message">Hi! 👋 I'm CampusAssist. Ask me about registration, course eligibility, minimum CGPA, credits, or specialization choices.</div></div>
+          <form id="chat-form" class="chat-input-row"><input id="chat-input" placeholder="Ask about CGPA, credits, registration…" autocomplete="off" maxlength="1000" aria-label="Your question" required><button type="submit" aria-label="Send message">↑</button></form>
+          <div class="chat-footnote">Uses an NLP FAQ helper and sample course rules. Confirm official policies with your college.</div>
+        </section>
+      </aside>
+    </section>
+    <section class="bottom-banner"><div class="banner-icon">✦</div><div><h3>Make course selection clearer.</h3><p>Check the sample requirements and confirm official rules before final submission.</p></div><a href="#registration" class="text-link">Back to form ↑</a></section>
+  </main>
+  <footer><a class="brand footer-brand" href="#"><span class="brand-mark">C</span><span>Campus<span class="brand-light">Assist</span><small>STUDENT REGISTRATION PORTAL</small></span></a><p>Student specialization registration · Educational prototype</p><span>HTML · CSS · JavaScript · Python NLP</span></footer>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
